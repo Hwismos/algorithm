@@ -1,65 +1,124 @@
 n, m = map(int, input().split())
-row, col, direction = map(int, input().split())
+x, y, direction = map(int, input().split())
 data = []
 for _ in range(n):
     data.append(list(map(int, input().split())))
 
-new_row, new_col = row, col
-new_direction = direction
+d = [[0] * m for _ in range(n)]
+d[x][y] = 1  # 현재 좌표 방문 처리
+
+# 북, 동, 남, 서
+dx = [-1, 0, 1, 0]
+dy = [0, 1, 0, -1]
 
 
-def is_sea():
-    # 이동된 위치가 바다면 True 반환
-    if data[new_row][new_col] == 1:
+# 왼쪽으로 회전
+# change_direction
+def turn_left():
+    global direction
+    direction -= 1
+    if direction == -1:
+        direction = 3
+
+
+##########################################################################
+
+
+def change_direction():
+    global direction
+    direction -= 1
+    if direction == -1:
+        direction = 3
+
+
+moves = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+
+def set_new_position(row, col):
+    new_x = row + moves[direction][0]
+    new_y = col + moves[direction][1]
+
+    return new_x, new_y
+
+
+def set_past_position(row, col):
+    new_x = row - moves[direction][0]
+    new_y = col - moves[direction][1]
+
+    return new_x, new_y
+
+
+def update_position(new_pos):
+    global x, y
+    x, y = new_pos[0], new_pos[1]
+
+
+def is_sea(new_pos):
+    if data[new_pos[0]][new_pos[1]] == 1:
         return True
     return False
 
 
-def has_gone_before():
-    # 가본 곳은 2로 표기
-    if data[new_row][new_col] == 2:
+def has_gone_before(new_pos):
+    if d[new_pos[0]][new_pos[1]] == 1:
         return True
     return False
 
 
-def make_move_back():
-    global new_row, new_col     # ?
-    new_row = row
-    new_col = col
-
-    # data[new_row][new_col] = 0  # ?
+def log_visited(new_pos):
+    d[new_pos[0]][new_pos[1]] = 1
 
 
-def make_move():
-    global new_row
-    global new_col
-
-    new_row = row + moves[direction][0]
-    new_col = col + moves[direction][1]
-
-
-def change_direction(x):
-    if x > 1:
-        return x - 1
-    # 0이면 3 반환
-    else:
-        return 3
-
-
-moves = [(-1, 0), (0, 1), (1, 0), (0, -1)]  # 북, 동, 서 ,남
-
+# 시뮬레이션 시작
+count = 1
+turn_time = 0
 while True:
-    print(f'위치: ({new_row}, {new_col})')
-    if has_gone_before() or is_sea():  # 이동해온 곳이 이미 가본 칸이거나 바다로 되어 있다면
-        make_move_back()  # 뒤로 이동
-        if is_sea():    # 뒤로 갔는데 바다면 종료
-            break
-        data[new_row][new_col] = 0
+    # change_direction
+    # turn_left()
+    change_direction()
+
+    # make_move
+    # nx = x + dx[direction]
+    # ny = y + dy[direction]
+    nx, ny = set_new_position(x, y)
+
+    # 회전한 이후 정면에 가보지 않은 칸이 있는 경우 이동
+    # 가보지 않았고 육지여야 함
+    # if d[nx][ny] == 0 and data[nx][ny] == 0:
+    if not (has_gone_before((nx, ny))) and not (is_sea((nx, ny))):
+        # 방문 기록
+        # d[nx][ny] = 1
+        log_visited((nx, ny))
+
+        # 위치 갱신
+        # x = nx
+        # y = ny
+        update_position((nx, ny))
+        count += 1
+        turn_time = 0   # ★
         continue
-    row = new_row
-    col = new_col
-    data[row][col] = 2
-    for i in range(len(moves)):  # 네 방향에 대해
-        direction = change_direction(direction)
-        make_move()
-        break
+    # 회전 이후 모두 가본 칸이거나 바다
+    else:
+        turn_time += 1
+    if turn_time == 4:
+        # nx = x - dx[direction]
+        # ny = y - dy[direction]
+        nx, ny = set_past_position(x, y)
+        # print(f'방향: {direction}, ({x}, {y}), ({nx}, {ny})')
+
+        # make_move_back
+        # if data[nx][ny] == 0:
+        if not (is_sea((nx, ny))):
+            # x = nx
+            # y = ny
+            update_position((nx, ny))
+        # if is_sea():
+        else:
+            # print(f'방향: {direction}, ({x}, {y}), ({nx}, {ny})')
+            break
+        turn_time = 0
+print(count)
+
+# 방문 위치 확인
+for i in range(len(d)):
+    print(d[i])
