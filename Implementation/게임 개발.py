@@ -95,12 +95,13 @@ while True:
         # y = ny
         update_position((nx, ny))
         count += 1
-        turn_time = 0   # ★
+
+        turn_time = 0   # reset_turn_time()
         continue
     # 회전 이후 모두 가본 칸이거나 바다
     else:
-        turn_time += 1
-    if turn_time == 4:
+        turn_time += 1      # increase_turn_time()
+    if turn_time == 4:      # if check_all_directions():
         # nx = x - dx[direction]
         # ny = y - dy[direction]
         nx, ny = set_past_position(x, y)
@@ -114,9 +115,8 @@ while True:
             update_position((nx, ny))
         # if is_sea():
         else:
-            # print(f'방향: {direction}, ({x}, {y}), ({nx}, {ny})')
             break
-        turn_time = 0
+        turn_time = 0       # reset_turn_time()
 print(count)
 
 # 방문 위치 확인
