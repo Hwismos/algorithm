@@ -72,10 +72,22 @@ def rotate_key(key):
     return rotated_key
 
 
+def is_lock_one(lock):
+    for each_line in lock:
+        if not (all(each_line)):
+            return False
+    else:
+        return True
+
+
 def solution(key, lock):
+    if is_lock_one(lock):
+        return True
+
     big_lock = make_lock_bigger(key, lock)
 
     for i in range(4):
+        print_matrix(key)
         if is_match(key, big_lock):
             return True
         key = rotate_key(key)
@@ -83,8 +95,9 @@ def solution(key, lock):
 
 
 def main():
-    key = [[0, 0, 0], [1, 0, 0], [0, 1, 1]]
+    key = [[0, 0, 0], [1, 1, 0], [0, 1, 1]]
     lock = [[1, 1, 1], [1, 1, 0], [1, 0, 1]]
+    # lock = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
     if solution(key, lock):
         print('True')
     else:
