@@ -11,6 +11,8 @@
 -> 9
 """
 
+from collections import deque
+
 n = int(input())
 k = int(input())
 apple = []
@@ -18,17 +20,25 @@ for _ in range(k):
     apple.append(tuple(map(int, input().split())))
 l = int(input())
 directions = []
-for _ in range(l):
-    directions.append(tuple(map(int, input().split())))
+for i in range(l):
+    directions.append(input().split())
 
-head_pos = [(0, 0)]
-tail_pos = [(0, 0)]
+# initial pos
+x = 0
+y = 0
+tail_pos = deque([(0, 0)])
 dir_ = 'D'
 time = 0
-while True:
-    # get_now_pos
-    x, y = head_pos[-1][0], head_pos[-1][1]
 
+
+def is_apple():
+    if [new_x, new_y] in apple:
+        apple.remove([new_x, new_y])
+        return True
+    return False
+
+
+while True:
     # move_head()
     if dir_ == 'D':
         new_x = x
@@ -37,16 +47,14 @@ while True:
         new_x = x + 1
         new_y = y
 
-    if game_over():
+    if not(0 <= new_x <= n-1 and 0 <= new_y <= n-1) or (new_x, new_y) in tail_pos:
         time += 1
         break
 
-    if is_apple():
-        # 몸길이를 늘림
-        pass
-    else:
+    if not(is_apple()):
         # 몸길이 유지
-        pass
+        tail_pos.pop()
+        tail_pos.appendleft((new_x, new_y))
 
     # time_up()
     time += 1
@@ -57,3 +65,7 @@ while True:
         else:
             dir_ = d[0][1]
             directions.pop(0)
+    # update pos
+    x = new_x
+    y = new_y
+print(time)
